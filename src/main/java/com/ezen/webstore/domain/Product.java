@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-
-
 @Getter
 @Setter
 @EqualsAndHashCode
@@ -50,6 +48,11 @@ public class Product implements Serializable {
 	public String getUnitPriceStr() {
 		return unitPriceStr;
 	}
+	
+	public String getUnitsInStockStr() {
+		DecimalFormat formatter = new DecimalFormat("#,###");
+		return formatter.format(unitsInStock);
+	}
 
 	public void setUnitPriceStr(String unitPriceStr) {
 		this.unitPriceStr = unitPriceStr;
@@ -85,6 +88,7 @@ public class Product implements Serializable {
 
 	public void setUnitsInStock(long unitsInStock) {
 		this.unitsInStock = unitsInStock;
+		
 	}
 
 	public long getUnitsInOrder() {
