@@ -19,7 +19,7 @@ public class DispatcherServletInitializer
 
     @Override
     protected String[] getServletMappings() {
-        return new String[] { "/" };
+        return new String[] { "/app/*" };
     }
 }
 
