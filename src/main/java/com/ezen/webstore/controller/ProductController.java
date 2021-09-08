@@ -14,12 +14,11 @@ import com.ezen.webstore.service.ProductService;
 
 @Controller
 public class ProductController {
-	@Autowired
-	private ProductRepository productRepository;
-
+	
 	@Autowired
 	private ProductService productService;
 	
+
 	@RequestMapping("/update/stock")
 	public String updateAllStock() {
 		 int rc = productService.updateAllStock();
@@ -30,7 +29,7 @@ public class ProductController {
 	@RequestMapping("/products") 
 	public String list(Model model) { 
 		model.addAttribute("products", 
-			productRepository.getAllProducts());
+				productService.getAllProducts());
 		return "products";
 	} 
 }

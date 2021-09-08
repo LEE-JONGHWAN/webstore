@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ezen.webstore.domain.Product;
 import com.ezen.webstore.domain.repository.ProductRepository;
+import com.ezen.webstore.service.ProductService;
 
 //@formatter:off
 @Repository
@@ -28,6 +29,8 @@ public class MariaProductRepository implements ProductRepository {
 				params, new ProductMapper());
 		return result;
 	}
+	
+
 
 	private static final class ProductMapper implements RowMapper<Product> {
 		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -57,4 +60,6 @@ public class MariaProductRepository implements ProductRepository {
 			return jdbcTemplate.update(SQL, params); 
 	}
 	//@formatter:on
+
+
 }

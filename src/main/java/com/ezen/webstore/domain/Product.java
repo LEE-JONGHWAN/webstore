@@ -3,6 +3,7 @@ package com.ezen.webstore.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,47 @@ public class Product implements Serializable {
 	
 	
 	
+	public Product() {
+		super();
+	}
+
+	public Product(String productId, 
+			String name, 
+			BigDecimal unitPrice) {
+		this.productId = productId;
+		this.name = name;
+		this.setUnitPrice(unitPrice);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(category, condition, description, 
+				discontinued, manufacturer, name, productId, unitPrice,
+				unitPriceStr, unitsInOrder, unitsInStock);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Product other = (Product) obj;
+		return Objects.equals(category, other.category) 
+				&& Objects.equals(condition, other.condition)
+				&& Objects.equals(description, other.description) 
+				&& discontinued == other.discontinued
+				&& Objects.equals(manufacturer, other.manufacturer) 
+				&& Objects.equals(name, other.name)
+				&& Objects.equals(productId, other.productId) 
+				&& Objects.equals(unitPrice, other.unitPrice)
+				&& Objects.equals(unitPriceStr, other.unitPriceStr) 
+				&& unitsInOrder == other.unitsInOrder
+				&& unitsInStock == other.unitsInStock;
+	}
+
 	public String getProductId() {
 		return productId;
 	}
@@ -47,16 +89,17 @@ public class Product implements Serializable {
 	public String getUnitPriceStr() {
 		return unitPriceStr;
 	}
-	
-	public String getUnitsInStockStr() {
-		DecimalFormat formatter = new DecimalFormat("#,###");
-		return formatter.format(unitsInStock);
-	}
 
 	public void setUnitPriceStr(String unitPriceStr) {
 		this.unitPriceStr = unitPriceStr;
 	}
-
+	
+	public void setUnitPrice(BigDecimal unitPrice) {
+		this.unitPrice = unitPrice;
+		DecimalFormat df = new DecimalFormat("#,###");
+		this.unitPriceStr = df.format(unitPrice);
+	} 
+	
 	public String getDescription() {
 		return description;
 	}
@@ -84,10 +127,14 @@ public class Product implements Serializable {
 	public long getUnitsInStock() {
 		return unitsInStock;
 	}
+	
+	public String getUnitsInStockStr() {
+		DecimalFormat formatter = new DecimalFormat("#,###");
+		return formatter.format(unitsInStock);
+	}
 
 	public void setUnitsInStock(long unitsInStock) {
 		this.unitsInStock = unitsInStock;
-		
 	}
 
 	public long getUnitsInOrder() {
@@ -121,48 +168,5 @@ public class Product implements Serializable {
 	public BigDecimal getUnitPrice() {
 		return unitPrice;
 	}
-
-	public Product() {
-		super();
-	}
-	
-	public Product(String productId, String name, BigDecimal unitPrice) {
-		this.productId = productId;
-		this.name = name;
-		this.setUnitPrice(unitPrice);
-	}
-
-	// 여기 getters와 setters 를 추가
-	public void setUnitPrice(BigDecimal unitPrice) {
-		this.unitPrice = unitPrice;
-		DecimalFormat df = new DecimalFormat("#,###");
-		this.unitPriceStr = df.format(unitPrice);
-	} // https://stackoverflow.com/questions/26101918/
-
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Product other = (Product) obj;
-		if (productId == null) {
-			if (other.productId != null)
-				return false;
-		} else if (!productId.equals(other.productId))
-			return false;
-		return true;
-	}	
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((productId == null) ? 0 :
-				productId.hashCode());
-		return result;
-	}	
 }
+
