@@ -26,6 +26,8 @@ public class Product implements Serializable {
 	private String condition;
 
 	
+	
+	
 	public String getProductId() {
 		return productId;
 	}

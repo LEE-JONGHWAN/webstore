@@ -8,7 +8,7 @@ public class DispatcherServletInitializer
     // AACDSInitializer
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return null;
+        return  new Class[] { RootApplicationContextConfig.class };
     }
 
     @Override
@@ -19,7 +19,7 @@ public class DispatcherServletInitializer
 
     @Override
     protected String[] getServletMappings() {
-        return new String[] { "/app/*" };
+        return new String[] { "/" };
     }
 }
 

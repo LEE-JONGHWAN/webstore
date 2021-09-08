@@ -20,6 +20,7 @@
 
 	<section class="container">
 		<div class="row">
+			<c:forEach items="${products}" var="product">
 			<div class="col-sm-6 col-md-3">
 				<div class="thumbnail">
 					<div class="caption">
@@ -27,10 +28,10 @@
 						<p>${product.description}</p>
 						<p>₩${product.unitPriceStr}</p>
 						<p>제고 수량 : ${product.unitsInStockStr}</p>
-
 					</div>
 				</div>
 			</div>
+		  </c:forEach>
 		</div>
 	</section>
 </body>
