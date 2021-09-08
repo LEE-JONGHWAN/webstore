@@ -5,13 +5,10 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 
-@Getter
-@Setter
+
 @EqualsAndHashCode
 @NoArgsConstructor
 public class Product implements Serializable {
