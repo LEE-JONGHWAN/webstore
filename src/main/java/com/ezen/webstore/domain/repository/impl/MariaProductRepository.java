@@ -54,7 +54,7 @@ public class MariaProductRepository implements ProductRepository {
 			params.put("unitsInStock", noOfUnits); 
 			params.put("id", productId); 
 			
-			jdbcTemplate.update(SQL, params); 
+			return jdbcTemplate.update(SQL, params); 
 	}
 	//@formatter:on
 }
