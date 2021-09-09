@@ -63,12 +63,10 @@ public class ProductController {
 	}
 	
 	@RequestMapping("/product") // 7절 실습
-	public String getProductById(
-			@RequestParam("id") 
-			String productId, Model model) {
+	public String getProductById( Model model,
+			@RequestParam String id) {
 		model.addAttribute("product", 
-			productService.getProductById(productId));
-		
+			productService.getProductById(id));
 		return "product";
 	}	
 }
