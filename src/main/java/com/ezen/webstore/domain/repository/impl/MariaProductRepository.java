@@ -30,7 +30,19 @@ public class MariaProductRepository implements ProductRepository {
 		return result;
 	}
 	
-
+	@Override
+	public List<Product> getAllProducts(String...args) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		String query = "SELECT * FROM products";
+		
+		if (args.length == 1) {
+			query += " WHERE LCASE(CATEGORY) = :category";
+			params.put("category", args[0]);
+		}
+		List<Product> result = jdbcTemplate.query(query, 
+				params, new ProductMapper());
+		return result;
+	}
 
 	private static final class ProductMapper implements RowMapper<Product> {
 		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -60,6 +72,8 @@ public class MariaProductRepository implements ProductRepository {
 			return jdbcTemplate.update(SQL, params); 
 	}
 	//@formatter:on
+
+
 
 
 }

@@ -32,7 +32,14 @@ public class ProductController {
 		model.addAttribute("products", 
 				productService.getAllProducts());
 		return "products";
-	} 
+	}
+	
+	@RequestMapping("/products/laptop")
+	public String laptop(Model model) {
+		model.addAttribute("products",
+			productService.getAllProducts("laptop"));
+		return "products";
+	}
 }
 
 
