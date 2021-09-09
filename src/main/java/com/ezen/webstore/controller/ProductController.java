@@ -13,6 +13,7 @@ import com.ezen.webstore.service.ProductService;
 
 
 @Controller
+@RequestMapping("market")
 public class ProductController {
 	
 	@Autowired
@@ -23,7 +24,7 @@ public class ProductController {
 	public String updateAllStock() {
 		 int rc = productService.updateAllStock();
 		 System.out.println("updated row count: " + rc);
-		 return "redirect:/products";
+		 return "redirect:/market/products";
 	}
 	
 	@RequestMapping("/products") 
