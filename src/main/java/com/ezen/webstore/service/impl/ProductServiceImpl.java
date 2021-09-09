@@ -38,6 +38,12 @@ public class ProductServiceImpl implements ProductService {
 	public List<Product> getAllProducts(String string) {
 		return productRepository.getAllProducts(string);
 	}
+
+	@Override
+	public List<Product> getProductsByCategory(String category) {
+		return productRepository.getProductsByCategory(category);
+	}
+
 	
 }
 
