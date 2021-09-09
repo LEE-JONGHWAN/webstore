@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.MatrixVariable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.ezen.webstore.service.ProductService;
 
@@ -36,6 +37,13 @@ public class ProductController {
 		return "products";
 	}
 	
+	@RequestMapping("/products/laptop")
+	public String laptop(Model model) {
+		model.addAttribute("products",
+			productService.getAllProducts("laptop"));
+		return "products";
+	}
+	
 	@RequestMapping("/products/{category}") 
 	public String getProductsByCategory(Model model, 
 			@PathVariable String category) {
@@ -54,12 +62,15 @@ public class ProductController {
 		return "products";
 	}
 	
-	@RequestMapping("/products/laptop")
-	public String laptop(Model model) {
-		model.addAttribute("products",
-			productService.getAllProducts("laptop"));
-		return "products";
-	}
+	@RequestMapping("/product") // 7절 실습
+	public String getProductById(
+			@RequestParam("id") 
+			String productId, Model model) {
+		model.addAttribute("product", 
+			productService.getProductById(productId));
+		
+		return "product";
+	}	
 }
 
 
