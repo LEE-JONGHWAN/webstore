@@ -8,7 +8,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-<title>상품</title>
+<title>
+<spring:message code="products.title"/> 
+</title>
 </head>
 <body>
 	<script>
@@ -17,10 +19,15 @@
 	<section>
     		<div class="jumbotron">
 			<div class="container">
-				<h1>상품 목록</h1>
+				<h1>
+				<spring:message code="products.topsection.h1"/> 
+				</h1>
 				<p>All the available products in our store</p>
-				<p><a href="${home}">홈으로</a></p>
-			</div>
+				<p><a href="${home}">
+				<spring:message code="products.topsection.tohome.anchor"/>
+				</a>
+			</p>
+		</div>
   	</div>
 	</section>
 
@@ -33,13 +40,16 @@
 						<h3>${product.name}</h3>
 						<p>${product.description}</p>
 						<p>₩${product.unitPriceStr}</p>
-						<p>제고 수량 : ${product.unitsInStockStr}</p>
+						<p>
+						<spring:message code="products.product.unitsInStockStr.label"/>
+							${product.unitsInStockStr}</p>
 						<p>
 							<a
 								href="<spring:url
 								value='/market/product?id=${product.productId}' /> "
 								class="btn btn-primary"> 
-								<span class="glyphicon-info-sign glyphicon"/></span>상세정보
+								<span class="glyphicon-info-sign glyphicon"/></span>
+								<spring:message code="products.product.detailInfo.anchor"/>
 							</a>
 						</p>
 					</div>

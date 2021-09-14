@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,12 +14,10 @@ import org.springframework.stereotype.Repository;
 
 import com.ezen.webstore.domain.Product;
 import com.ezen.webstore.domain.repository.ProductRepository;
-import com.ezen.webstore.service.ProductService;
 
 //@formatter:off
 @Repository
 public class MariaProductRepository implements ProductRepository {
-
 	@Autowired
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -28,8 +27,9 @@ public class MariaProductRepository implements ProductRepository {
 		List<Product> result = jdbcTemplate.query("SELECT * FROM products", 
 				params, new ProductMapper());
 		return result;
+
 	}
-	
+
 	@Override
 	public List<Product> getAllProducts(String...args) {
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -43,8 +43,9 @@ public class MariaProductRepository implements ProductRepository {
 				params, new ProductMapper());
 		return result;
 	}
-
+	
 	private static final class ProductMapper implements RowMapper<Product> {
+		@Override
 		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Product product = new Product();
 			product.setProductId(rs.getString("ID"));
@@ -63,13 +64,13 @@ public class MariaProductRepository implements ProductRepository {
 
 	@Override
 	public int updateStock(String productId, long noOfUnits) {
-		String SQL = "UPDATE PRODUCTS SET "
-				+ "UNITS_IN_STOCK = :unitsInStock WHERE ID = :id"; 
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("unitsInStock", noOfUnits); 
-			params.put("id", productId); 
-			
-			return jdbcTemplate.update(SQL, params); 
+		String SQL = "UPDATE PRODUCTS SET " +
+				"UNITS_IN_STOCK = :unitsInStock WHERE ID = :id";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("id", productId);
+		params.put("unitsInStock", noOfUnits);
+
+		return jdbcTemplate.update(SQL, params);
 	}
 
 	@Override
@@ -81,7 +82,6 @@ public class MariaProductRepository implements ProductRepository {
 		params.put("category", category.toLowerCase());
 		return jdbcTemplate.query(SQL, params, new ProductMapper());
 	}
-	
 
 	@Override
 	public List<Product> getProductsByFilter(
@@ -92,6 +92,7 @@ public class MariaProductRepository implements ProductRepository {
 		return jdbcTemplate.query(SQL, filterParams, new ProductMapper());
 	}
 
+	@Override
 	public Product getProductById(String productID) {
 		String SQL = "SELECT * FROM PRODUCTS WHERE ID = :id";
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -102,20 +103,43 @@ public class MariaProductRepository implements ProductRepository {
 
 	@Override
 	public List<Product> getProdsByMultiFilter(String productCategory, 
-			Map<String, String> criteria, String brand) {
-		String SQL = "SELECT * FROM PRODUCTS WHERE CATEGORY = :category "
-				+ "AND MANUFACTURER = :brand "
-				+ "AND UNIT_PRICE >= :low And UNIT_PRICE <= :high";
-		criteria.put("category", productCategory); // **
-		criteria.put("brand", brand);
-		return jdbcTemplate.query(SQL, criteria, new ProductMapper());
+			Map<String, String> criteria, Optional<String> brand) {
+		var SQL = new StringBuilder("SELECT * FROM PRODUCTS");
+		SQL.append(" WHERE CATEGORY = :category");
+		SQL.append(" AND UNIT_PRICE >= :low And UNIT_PRICE <= :high");
+		if (brand.isPresent()) {
+			SQL.append(" AND MANUFACTURER = :brand ");
+			criteria.put("brand", brand.get());
+		}
+		criteria.put("category", productCategory);
+		
+		return jdbcTemplate.query(SQL.toString(), criteria, 
+				new ProductMapper());
 	}
-
-	
 	//@formatter:on
 
-
-
-
-
+	@Override
+	public void addProduct(Product product) {
+		var SQL = new StringBuilder("INSERT INTO PRODUCTS");
+		SQL.append(" (ID, PROD_NAME, DESCRIPTION, UNIT_PRICE,");
+		SQL.append(" MANUFACTURER, CATEGORY, PROD_CONDITION,");
+		SQL.append(" UNITS_IN_STOCK, UNITS_IN_ORDER, DISCONTINUED)");
+		SQL.append(" VALUES (:id, :name, :desc, :price, :manufacturer,");
+		SQL.append(" :category, :condition, :inStock, :inOrder, ");
+		SQL.append(" :discontinued)"); 
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("id", product.getProductId());  
+		params.put("name", product.getName());  
+		params.put("desc", product.getDescription());  
+		params.put("price", product.getUnitPrice());  
+		params.put("manufacturer", product.getManufacturer());  
+		params.put("category", product.getCategory());  
+		params.put("condition", product.getCondition());  
+		params.put("inStock", product.getUnitsInStock());  
+		params.put("inOrder", product.getUnitsInOrder());  
+		params.put("discontinued", product.isDiscontinued());  	
+		
+		jdbcTemplate.update(SQL.toString(), params); 
+	}
 }

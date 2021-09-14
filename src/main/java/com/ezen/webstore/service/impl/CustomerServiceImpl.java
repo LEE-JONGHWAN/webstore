@@ -12,11 +12,15 @@ import com.ezen.webstore.service.CustomerService;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 	@Autowired
-	private CustomerRepository customerRepository;
-
+	private CustomerRepository customerRepository;	
+	
 	@Override
 	public List<Customer> getAllCustomers() {
 		return customerRepository.getAllCustomers();
 	}
 
+	@Override
+	public void addCustomer(Customer customer) {
+		customerRepository.addCustomer(customer);
+	}
 }
