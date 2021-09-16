@@ -3,7 +3,8 @@ package com.ezen.webstore.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.Objects;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -29,6 +30,8 @@ public class Product implements Serializable {
 	private long unitsInOrder;
 	private boolean discontinued;
 	private String condition;
+	private MultipartFile productImage;
+	
 	
 	public Product() {
 		super();

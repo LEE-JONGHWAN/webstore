@@ -23,17 +23,28 @@
 	</section>
 	<section class="container">
 		<form:form method="POST" modelAttribute="newProduct"
-			class="form-horizontal">
+			class="form-horizontal" enctype="multipart/form-data">
 			<fieldset>
 				<legend>신상품 정보 입력</legend>
 				<div class="form-group">
 					<label class="control-label col-lg-2 col-lg-2" for="productId">
 						<spring:message code="addProduct.form.productId.label"/>
 					</label>
-					<div class="col-lg-10">
-						<form:input id="productId" path="productId" type="text"
-							class="form:input-large" />
-					</div>
+					<c:choose>
+						<c:when test="${update}">
+							<div class="col-lg-10">
+								<form:input id="productId" path="productId" type="text"
+									class="form:input-large" readonly="true" 
+									value="${newProduct.productId}" />
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="col-lg-10">
+								<form:input id="productId" path="productId" type="text"
+									class="form:input-large" />
+							</div>
+						</c:otherwise>
+					</c:choose>
 				</div>
 
 				<div class="form-group">
@@ -99,33 +110,45 @@
 					</div>
 				</div>
 
-				<div class="form-group">
+			<%-- 	<div class="form-group">
 					<label class="control-label col-lg-2" for="discontinued">
 						생산 중단됨</label>
 					<div class="col-lg-10">
 						<form:checkbox id="discontinued" path="discontinued" />
 					</div>
-				</div>
+				</div> --%>
 
 				<div class="form-group">
-					<label class="control-label col-lg-2" for="condition"> 상품
-						상태</label>
+					<label class="control-label col-lg-2" for="condition">
+					 	<spring:message code="addProduct.form.condition.label"/>
+					 </label>
 					<div class="col-lg-10">
 						<form:radiobutton path="condition" value="New" />
 						New
 						<form:radiobutton path="condition" value="Old" />
 						Old
 						<form:radiobutton path="condition" value="Refurbished" />
-						Refurbished
+						중고품
 					</div>
 				</div>
-
+				
+				<div class="form-group">
+					<label class="control-label col-lg-2" for="productImage"> 
+						<spring:message code="addProduct.form.productImage.label" />
+					</label>
+					<div class="col-lg-10">
+						<form:input id="productImage" path="productImage" type="file"
+							class="form:input-large" />
+					</div>
+				</div> 
+				 
 				<div class="form-group">
 					<div class="col-lg-offset-2 col-lg-10">
 						<input type="submit" id="btnAdd" class="btn btn-primary"
 							value="Add" />
 					</div>
 				</div>
+				
 			</fieldset>
 		</form:form>
 	</section>

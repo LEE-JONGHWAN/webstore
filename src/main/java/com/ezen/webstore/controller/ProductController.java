@@ -3,6 +3,8 @@ package com.ezen.webstore.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ezen.webstore.domain.Product;
 import com.ezen.webstore.service.ProductService;
@@ -32,6 +35,7 @@ public class ProductController {
 
 	/**
 	 * 신상품 추가 폼을 반환한다.
+	 * 
 	 * @param model 빈을 연결해주는 기본 자료
 	 * @return 폼 LVN(논리뷰명칭)
 	 */
@@ -41,6 +45,36 @@ public class ProductController {
 		return "addProduct";
 	}
 
+	@RequestMapping(value = "/product/update", method = RequestMethod.GET)
+	public String updateProduct(Model model, 
+			@ModelAttribute("newProduct") Product newProduct,
+			@RequestParam("id") String productId) {
+		model.addAttribute("newProduct", 
+				productService.getProductById(productId));
+		model.addAttribute("update", true);
+
+		return "addProduct";
+	}
+
+	@RequestMapping(value = "/product/update", method = RequestMethod.POST)
+	public String updateProduct(Model model, 
+			@ModelAttribute("newProduct") Product updatedProduct,
+			BindingResult result, HttpServletRequest request) {
+		
+		String[] suppressedFields = result.getSuppressedFields();
+		
+		if (suppressedFields.length > 0) {
+			throw new RuntimeException("허용되지 않은 것 중 바인딩 시도된 항목 : " + 
+				StringUtils.arrayToCommaDelimitedString(suppressedFields));
+		}
+		String rootDirectory = 
+				request.getSession().getServletContext().getRealPath("/");
+
+		productService.updateProduct(updatedProduct, rootDirectory);
+		return "redirect:/market/products";
+	}
+	//@formatter:off
+
 	/**
 	 * 신상품 정보를 FBBean(Form Backing Bean)을 통해서 받아와서 저장한다.
 	 * @param newProduct 폼 배킹 빈
@@ -49,7 +83,8 @@ public class ProductController {
 	 */
 	@RequestMapping(value = "/products/add", method = RequestMethod.POST)
 	public String processAddNewProductForm(@ModelAttribute("newProduct") 
-			Product newProduct, BindingResult result) {
+			Product newProduct, BindingResult result,
+			HttpServletRequest request) {
 		String[] suppressedFields = result.getSuppressedFields();
 		if (suppressedFields.length > 0) {
 			throw new RuntimeException("허용되지 않은 것 중 바인딩 시도된 항목 : " + 
@@ -66,8 +101,11 @@ public class ProductController {
 	}
 
 	@RequestMapping("/products")
-	public String list(Model model) {
-		model.addAttribute("products", productService.getAllProducts());
+	public String list(Model model, HttpServletRequest request) {
+		String root = request.getSession().
+				getServletContext().getRealPath("/");
+		model.addAttribute("products", 
+				productService.getAllProducts(root));
 		return "products";
 	}
 
@@ -93,24 +131,19 @@ public class ProductController {
 
 		return "products";
 	}
-
+	
 	@RequestMapping("/product")
 	public String getProductById(Model model, @RequestParam("id") String productId) {
 		model.addAttribute("product", productService.getProductById(productId));
-
+		
 		return "product";
 	}
 	
 	//@formatter:on
 	@InitBinder
 	public void initialiseBinder(WebDataBinder binder) {
-		binder.setAllowedFields("productId", "name", "unitPrice", "description",
-				"manufacturer", "category", "unitsInStock", "condition");
+		binder.setAllowedFields("productId", "id", "name", "unitPrice", 
+				"description", "manufacturer", "category",
+				"unitsInStock", "condition", "productImage");
 	}
-	@InitBinder
-	public void initialiseBinder2(String binder) {
-//		binder.setAllowedFields("productId", "name", "unitPrice", "description",
-//				"manufacturer", "category", "unitsInStock", "condition");
-	}
-
 }

@@ -1,5 +1,9 @@
 package com.ezen.webstore.domain.repository.impl;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -15,6 +19,8 @@ import org.springframework.stereotype.Repository;
 import com.ezen.webstore.domain.Product;
 import com.ezen.webstore.domain.repository.ProductRepository;
 
+import lombok.NoArgsConstructor;
+
 //@formatter:off
 @Repository
 public class MariaProductRepository implements ProductRepository {
@@ -22,16 +28,15 @@ public class MariaProductRepository implements ProductRepository {
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
 	@Override
-	public List<Product> getAllProducts() {
+	public List<Product> getAllProducts(String root) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		List<Product> result = jdbcTemplate.query("SELECT * FROM products", 
-				params, new ProductMapper());
+				params, new ProductMapper(root));
 		return result;
-
 	}
 
 	@Override
-	public List<Product> getAllProducts(String...args) {
+	public List<Product> getAllProducts(String root, String...args) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		String query = "SELECT * FROM products";
 		
@@ -44,7 +49,12 @@ public class MariaProductRepository implements ProductRepository {
 		return result;
 	}
 	
+	@NoArgsConstructor
 	private static final class ProductMapper implements RowMapper<Product> {
+		String root;
+		ProductMapper(String root) {
+			this.root = root;
+		}
 		@Override
 		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Product product = new Product();
@@ -58,10 +68,35 @@ public class MariaProductRepository implements ProductRepository {
 			product.setUnitsInStock(rs.getLong("UNITS_IN_STOCK"));
 			product.setUnitsInOrder(rs.getLong("UNITS_IN_ORDER"));
 			product.setDiscontinued(rs.getBoolean("DISCONTINUED"));
+			
+			var blob = rs.getBlob("IMAGE");
+			if (blob != null && root != null) {
+				writeBytesToFile(root, blob.getBinaryStream(), rs.getString("ID"));
+			}
+
 			return product;
 		}
+		private void writeBytesToFile(String root, InputStream in, 
+				String prodID) {
+			String filePath = root + "resources\\images\\" 
+					+ prodID + ".png";
+			FileOutputStream out;
+			
+			try {
+				out = new FileOutputStream(filePath);
+				byte [] buff = new byte[4096];
+				int len = 0;
+				while ((len = in.read(buff)) != -1) {
+					out.write(buff, 0, len);
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-
+	
 	@Override
 	public int updateStock(String productId, long noOfUnits) {
 		String SQL = "UPDATE PRODUCTS SET " +
@@ -123,10 +158,17 @@ public class MariaProductRepository implements ProductRepository {
 		var SQL = new StringBuilder("INSERT INTO PRODUCTS");
 		SQL.append(" (ID, PROD_NAME, DESCRIPTION, UNIT_PRICE,");
 		SQL.append(" MANUFACTURER, CATEGORY, PROD_CONDITION,");
-		SQL.append(" UNITS_IN_STOCK, UNITS_IN_ORDER, DISCONTINUED)");
+		SQL.append(" UNITS_IN_STOCK, UNITS_IN_ORDER, DISCONTINUED");
+		
+		if (product.getProductImage() == null ||
+				product.getProductImage().getSize() == 0) {
+			SQL.append(")");
+		} else {
+			SQL.append(", IMAGE)");
+		}
 		SQL.append(" VALUES (:id, :name, :desc, :price, :manufacturer,");
 		SQL.append(" :category, :condition, :inStock, :inOrder, ");
-		SQL.append(" :discontinued)"); 
+		SQL.append(" :discontinued"); 
 		
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("id", product.getProductId());  
@@ -139,7 +181,55 @@ public class MariaProductRepository implements ProductRepository {
 		params.put("inStock", product.getUnitsInStock());  
 		params.put("inOrder", product.getUnitsInOrder());  
 		params.put("discontinued", product.isDiscontinued());  	
-		
+		try {
+			if (product.getProductImage() == null ||
+					product.getProductImage().getSize() == 0) {
+				SQL.append(")"); 
+			} else {
+				SQL.append(", :image)"); 
+				params.put("image", product.getProductImage().getBytes());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 	
 		jdbcTemplate.update(SQL.toString(), params); 
+	}
+
+	@Override
+	public void updateProduct(Product updated, String root) {
+		var SQL = new StringBuilder("update PRODUCTS set");
+		SQL.append(" PROD_NAME = :PROD_NAME,");
+		SQL.append(" DESCRIPTION = :DESCRIPTION,");
+		SQL.append(" UNIT_PRICE = :UNIT_PRICE,");
+		SQL.append(" CATEGORY = :CATEGORY,");
+		SQL.append(" PROD_CONDITION = :PROD_CONDITION,");
+		SQL.append(" UNITS_IN_STOCK = :UNITS_IN_STOCK,");
+		SQL.append(" UNITS_IN_ORDER = :UNITS_IN_ORDER,");
+		SQL.append(" DISCONTINUED = :DISCONTINUED");
+		
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("PROD_NAME", updated.getName()); 		
+		params.put("DESCRIPTION", updated.getDescription()); 		
+		params.put("UNIT_PRICE", updated.getUnitPrice()); 		
+		params.put("CATEGORY", updated.getCategory()); 		
+		params.put("PROD_CONDITION", updated.getCondition()); 		
+		params.put("UNITS_IN_STOCK", updated.getUnitsInStock()); 		
+		params.put("UNITS_IN_ORDER", updated.getUnitsInOrder()); 		
+		params.put("DISCONTINUED", updated.isDiscontinued()); 		
+		
+		try {
+			if (updated.getProductImage() == null ||
+					updated.getProductImage().getSize() == 0) {
+				SQL.append(" where id = :id");
+			} else {
+				SQL.append(", image = :image where id = :id");
+				params.put("image", updated.getProductImage().getBytes());
+			}
+			params.put("id", updated.getProductId()); 	
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 	
+		
+		jdbcTemplate.update(SQL.toString(), params);
 	}
 }
