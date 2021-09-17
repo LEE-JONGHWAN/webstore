@@ -1,8 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html>
 <html>
@@ -28,29 +28,27 @@
 				<legend>신상품 정보 입력</legend>
 				<div class="form-group">
 					<label class="control-label col-lg-2 col-lg-2" for="productId">
-						<spring:message code="addProduct.form.productId.label"/>
-					</label>
+						상품 ID </label>
 					<c:choose>
-						<c:when test="${update}">
-							<div class="col-lg-10">
-								<form:input id="productId" path="productId" type="text"
-									class="form:input-large" readonly="true" 
-									value="${newProduct.productId}" />
-							</div>
-						</c:when>
-						<c:otherwise>
-							<div class="col-lg-10">
-								<form:input id="productId" path="productId" type="text"
-									class="form:input-large" />
-							</div>
-						</c:otherwise>
+					<c:when test="${update}">
+						<div class="col-lg-10">
+							<form:input id="productId" path="productId" type="text"
+								class="form:input-large" readonly="true"
+								value="${newProduct.productId}" />
+						</div>
+					</c:when>
+					<c:otherwise>
+						<div class="col-lg-10">
+							<form:input id="productId" path="productId" type="text"
+								class="form:input-large" />
+						</div>
+					</c:otherwise>
 					</c:choose>
 				</div>
 
 				<div class="form-group">
 					<label class="control-label col-lg-2 col-lg-2" for="name">
-						상품명
-					</label>
+						상품명</label>
 					<div class="col-lg-10">
 						<form:input id="name" path="name" type="text"
 							class="form:input-large" />
@@ -93,15 +91,6 @@
 					</div>
 				</div>
 
-<%-- 				<div class="form-group">
-					<label class="control-label col-lg-2 col-lg-2" for="unitsInOrder">
-						주문 수량</label>
-					<div class="col-lg-10">
-						<form:input id="unitsInOrder" path="unitsInOrder" type="text"
-							class="form:input-large" />
-					</div>
-				</div> --%>
-
 				<div class="form-group">
 					<label class="control-label col-lg-2" for="description"> 상품
 						설명</label>
@@ -110,18 +99,9 @@
 					</div>
 				</div>
 
-			<%-- 	<div class="form-group">
-					<label class="control-label col-lg-2" for="discontinued">
-						생산 중단됨</label>
-					<div class="col-lg-10">
-						<form:checkbox id="discontinued" path="discontinued" />
-					</div>
-				</div> --%>
-
 				<div class="form-group">
-					<label class="control-label col-lg-2" for="condition">
-					 	<spring:message code="addProduct.form.condition.label"/>
-					 </label>
+					<label class="control-label col-lg-2" for="condition"> 상품
+						상태</label>
 					<div class="col-lg-10">
 						<form:radiobutton path="condition" value="New" />
 						New
@@ -131,35 +111,33 @@
 						중고품
 					</div>
 				</div>
-				
 				<div class="form-group">
 					<label class="control-label col-lg-2" for="productImage"> 
-						<spring:message code="addProduct.form.productImage.label" />
+					<spring:message code="addProduct.form.productImage.label" />
 					</label>
 					<div class="col-lg-10">
-						<form:input id="productImage" path="productImage" type="file"
-							class="form:input-large" />
+						<form:input id="productImage" path="productImage" 
+						type="file" class="form:input-large" />
 					</div>
-				</div> 
+				</div>
+				
 				<!-- 상품 안내서 입력 -->		
 				<div class="form-group">
 					<label class="control-label col-lg-2" for="productManual"> 
 						<spring:message code="addProduct.form.productManual.label" />
 					</label>
 					<div class="col-lg-10">
-					<form:input id="productManual" path="productManual" 
+					 <form:input id="productManual" path="productManual" 
 							type="file" class="form:input-large" />
 					</div>
 				</div>
 				
-				 
 				<div class="form-group">
 					<div class="col-lg-offset-2 col-lg-10">
 						<input type="submit" id="btnAdd" class="btn btn-primary"
 							value="Add" />
 					</div>
 				</div>
-				
 			</fieldset>
 		</form:form>
 	</section>

@@ -1,6 +1,5 @@
 package com.ezen.webstore.controller;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ezen.webstore.domain.Product;
@@ -37,11 +35,12 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productService;
-	
+
 	@ExceptionHandler(ProductNotFoundException.class)
 	public ModelAndView handleError(HttpServletRequest req, 
 			ProductNotFoundException exception) {
 		ModelAndView mav = new ModelAndView();
+		
 		mav.addObject("invalidProductId", exception.getProductId());
 		mav.addObject("exception", exception);
 		mav.addObject("url", 
@@ -50,7 +49,7 @@ public class ProductController {
 		
 		return mav;
 	}	
-
+	
 	/**
 	 * 신상품 추가 폼을 반환한다.
 	 * 
@@ -107,32 +106,7 @@ public class ProductController {
 		if (suppressedFields.length > 0) {
 			throw new RuntimeException("허용되지 않은 것 중 바인딩 시도된 항목 : " + 
 			StringUtils.arrayToCommaDelimitedString(suppressedFields));
-		}
-
-		/**
-		 * 상품 설명서 메모리 내용 정한 폴더에 파일로 보관
-		 */
-		MultipartFile productManual = newProduct.getProductManual();
-		if (productManual!=null && !productManual.isEmpty()) {
-			try {
-				String root = request.getSession().
-						getServletContext().getRealPath("/");
-				String dirPath = root + "resource\\pdf\\";
-				
-				File directory = new File(dirPath);
-				if(! directory.exists()) {
-					directory.mkdirs();
-				}
-					productManual.transferTo(new 
-						File(root +"resources\\pdf\\"
-								+ newProduct.getProductId() + ".pdf"));
-				
-			} catch (Exception e) {
-				throw new RuntimeException("상품 설명서 저장 실패", e);
-			}
-		}
-	
-		
+		}	
 		productService.addProduct(newProduct);
 		return "redirect:/market/products";
 	}
@@ -167,7 +141,6 @@ public class ProductController {
 			throw new NoProductsFoundUnderCategoryException();
 		}
 		model.addAttribute("products", products);
-
 		return "products";
 	}
 
@@ -186,17 +159,19 @@ public class ProductController {
 	}
 	
 	@RequestMapping("/product")
-	public String getProductById(Model model, @RequestParam("id") String productId) {
-		model.addAttribute("product", productService.getProductById(productId));
+	public String getProductById(Model model, 
+			@RequestParam("id") String productId) {
+		model.addAttribute("product",
+				productService.getProductById(productId));
 		
 		return "product";
 	}
 	
-	//@formatter:on
 	@InitBinder
 	public void initialiseBinder(WebDataBinder binder) {
-		binder.setAllowedFields("productId", "id", "name", "unitPrice", 
-				"description", "manufacturer", "category",
-				"unitsInStock", "condition", "productImage","productManual");
+		binder.setAllowedFields("productId", "id", "name", 
+				"unitPrice", "description", "manufacturer",
+				"category", "unitsInStock", "condition", 
+				"productImage", "productManual");
 	}
 }

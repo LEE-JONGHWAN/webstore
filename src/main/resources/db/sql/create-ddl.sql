@@ -1,0 +1,1 @@
+ALTER TABLE webstore.products ADD MANUAL mediumblob DEFAULT NULL NULL COMMENT 'PDF 파일'; 

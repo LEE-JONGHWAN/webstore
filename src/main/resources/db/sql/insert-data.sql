@@ -18,3 +18,6 @@ INSERT INTO customers VALUES (
   
 INSERT INTO customers VALUES (
   'C003', '최숙자', '충청도', 10000);
+  
+
+ 

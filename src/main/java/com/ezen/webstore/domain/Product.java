@@ -70,11 +70,11 @@ public class Product implements Serializable {
 	}
 	@XmlTransient
 	public MultipartFile getProductImage() {
-		return getProductImage();
+		return productImage;
 	}
 	@XmlTransient
 	public MultipartFile getProductManual() {
-		return getProductImage();
+		return productManual;
 	}
 		
 
