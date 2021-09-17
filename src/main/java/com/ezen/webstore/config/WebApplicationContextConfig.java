@@ -1,6 +1,7 @@
 package com.ezen.webstore.config;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -10,13 +11,17 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
@@ -25,6 +30,7 @@ import org.springframework.web.servlet.view.xml.MarshallingView;
 import org.springframework.web.util.UrlPathHelper;
 
 import com.ezen.webstore.domain.Product;
+import com.ezen.webstore.interceptor.ProcessingTimeLogInterceptor;
 
 //@formatter:off
 @Configuration
@@ -32,7 +38,31 @@ import com.ezen.webstore.domain.Product;
 @ComponentScan("com.ezen.webstore")
 public class WebApplicationContextConfig 
 	extends WebMvcConfigurerAdapter { 
+	
+	@Bean
+	public LocaleResolver localeResolver(){
+		SessionLocaleResolver resolver = new SessionLocaleResolver();
+		resolver.setDefaultLocale(new Locale("ko"));	
+		return resolver;
+	}	
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {      
+		registry.addInterceptor(new ProcessingTimeLogInterceptor());
 
+		LocaleChangeInterceptor localeChangeInterceptor = 
+			new LocaleChangeInterceptor();
+		localeChangeInterceptor.setParamName("language");
+		registry.addInterceptor(localeChangeInterceptor);	
+	}
+	
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/img/**")
+			.addResourceLocations("/resources/images/");
+		registry.addResourceHandler("/pdf/**")
+			.addResourceLocations("/resources/pdf/");
+	}
+	
 	@Bean
 	public ViewResolver contentNegotiatingViewResolver(
 			ContentNegotiationManager manager) {
@@ -69,13 +99,6 @@ public class WebApplicationContextConfig
     	return resolver;
     }
     
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/img/**")
-			.addResourceLocations("/resources/images/");
-		registry.addResourceHandler("/pdf/**")
-			.addResourceLocations("/resources/pdf/");
-	}
 
 	@Bean
 	public MessageSource messageSource() { 
