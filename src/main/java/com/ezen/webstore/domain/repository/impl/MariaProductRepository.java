@@ -1,5 +1,6 @@
 package com.ezen.webstore.domain.repository.impl;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
 //@formatter:off
 @Repository
 public class MariaProductRepository implements ProductRepository {
+	
 	@Autowired
 	private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -78,12 +80,20 @@ public class MariaProductRepository implements ProductRepository {
 		}
 		private void writeBytesToFile(String root, InputStream in, 
 				String prodID) {
-			String filePath = root + "resources\\images\\" 
-					+ prodID + ".png";
+			String dirPath = root + "resources\\images\\"; 
+					
+			File directory = new File(dirPath);
+			if (! directory.exists()) {
+				directory.mkdirs();
+			}
+			StringBuilder filePathSB = new StringBuilder(dirPath);
+			filePathSB.append(prodID);
+			filePathSB.append(".png");
+
 			FileOutputStream out;
 			
 			try {
-				out = new FileOutputStream(filePath);
+				out = new FileOutputStream(filePathSB.toString());
 				byte [] buff = new byte[4096];
 				int len = 0;
 				while ((len = in.read(buff)) != -1) {

@@ -1,5 +1,6 @@
 package com.ezen.webstore.controller;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -90,6 +91,31 @@ public class ProductController {
 			throw new RuntimeException("허용되지 않은 것 중 바인딩 시도된 항목 : " + 
 			StringUtils.arrayToCommaDelimitedString(suppressedFields));
 		}
+
+		/**
+		 * 상품 설명서 메모리 내용 정한 폴더에 파일로 보관
+		 */
+		MultipartFile productManual = newProduct.getProductManual();
+		if (productManual!=null && !productManual.isEmpty()) {
+			try {
+				String root = request.getSession().
+						getServletContext().getRealPath("/");
+				String dirPath = root + "resource\\pdf\\";
+				
+				File directory = new File(dirPath);
+				if(! directory.exists()) {
+					directory.mkdirs();
+				}
+					productManual.transferTo(new 
+						File(root +"resources\\pdf\\"
+								+ newProduct.getProductId() + ".pdf"));
+				
+			} catch (Exception e) {
+				throw new RuntimeException("상품 설명서 저장 실패", e);
+			}
+		}
+	
+		
 		productService.addProduct(newProduct);
 		return "redirect:/market/products";
 	}
@@ -104,8 +130,15 @@ public class ProductController {
 	public String list(Model model, HttpServletRequest request) {
 		String root = request.getSession().
 				getServletContext().getRealPath("/");
+		
+		long startTime = System.currentTimeMillis();
+
 		model.addAttribute("products", 
 				productService.getAllProducts(root));
+		
+		long endTime = System.currentTimeMillis();
+		System.out.println("That took " + (endTime - startTime) + " milliseconds");		
+		
 		return "products";
 	}
 
@@ -144,6 +177,6 @@ public class ProductController {
 	public void initialiseBinder(WebDataBinder binder) {
 		binder.setAllowedFields("productId", "id", "name", "unitPrice", 
 				"description", "manufacturer", "category",
-				"unitsInStock", "condition", "productImage");
+				"unitsInStock", "condition", "productImage","productManual");
 	}
 }
